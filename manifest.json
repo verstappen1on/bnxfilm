@@ -2,11 +2,10 @@
   "name": "Fortnite",
   "short_name": "Fortnite",
   "start_url": "https://verstappen1on.github.io/fortniteweb/index.html",
-  "display": "fullscreen", // Modo de exibição em tela cheia
-  "orientation": "landscape", // Define o modo de exibição como paisagem
+  "display": "fullscreen", 
+  "orientation": "landscape",
   "background_color": "#ffffff",
   "theme_color": "#000000",
-  "scope": "https://verstappen1on.github.io/fortniteweb/", // Define o escopo do aplicativo
   "icons": [
     {
       "src": "fortnite.png",
@@ -19,5 +18,5 @@
       "type": "image/png"
     }
   ],
-  "prefer_related_applications": false // Indica que não há aplicativos relacionados a serem preferidos
+  "prefer_related_applications": false 
 }
