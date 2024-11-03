@@ -20,53 +20,15 @@
       height: 100vh;
       background-color: #f0f0f0;
     }
-    h1 {
-      color: #333;
-    }
   </style>
 </head>
 <body>
 
-  <h1>Bem-vindo ao Aplicativo Web</h1>
-
+  <!-- Redireciona automaticamente para a URL desejada -->
   <script>
-    // Service Worker
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("service-worker.js").then(() => {
-        console.log("Service Worker registrado com sucesso.");
-      });
-    }
-
-    // Service Worker Inline
-    const serviceWorkerScript = `
-      self.addEventListener("install", (event) => {
-        event.waitUntil(
-          caches.open("app-cache").then((cache) => {
-            return cache.addAll(["/", "/index.html"]);
-          })
-        );
-      });
-      
-      self.addEventListener("fetch", (event) => {
-        event.respondWith(
-          caches.match(event.request).then((response) => {
-            return response || fetch(event.request);
-          })
-        );
-      });
-    `;
-
-    // Cria e registra o Service Worker com script inline
-    const blob = new Blob([serviceWorkerScript], { type: "text/javascript" });
-    const serviceWorkerUrl = URL.createObjectURL(blob);
-    navigator.serviceWorker.register(serviceWorkerUrl).then(() => {
-      console.log("Service Worker Inline registrado com sucesso.");
-    });
+    // Redirecionamento para a URL externa
+    window.location.href = "https://www.xbox.com/play";
   </script>
 
 </body>
-</html>
- 
-
-
-
+</html
