@@ -3,15 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Redirecionamento para Xbox Play</title>
-    <script>
-        // Redireciona automaticamente para a URL desejada
-        window.onload = function() {
-            window.location.href = 'https://xbox.com/play';
-        };
-    </script>
+    <title>Xbox Play WebView</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
 </head>
 <body>
-    <h1>Redirecionando para Xbox Play...</h1>
+    <iframe src="https://xbox.com/play" id="webview"></iframe>
 </body>
 </html>
