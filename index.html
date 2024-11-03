@@ -1,36 +1,43 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aplicativo Web</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aplicativo Fortnite</title>
 
-    <!-- Manifesto PWA embutido -->
-    <link rel="manifest" href="manifest.json">
+  <!-- Manifesto PWA embutido para forçar o modo standalone -->
+  <link rel="manifest" href="data:application/manifest+json,{
+    %22name%22:%22Fortnite%20Web%22,
+    %22short_name%22:%22Fortnite%22,
+    %22start_url%22:%22/%22,
+    %22display%22:%22standalone%22,
+    %22background_color%22:%22%23ffffff%22,
+    %22theme_color%22:%22%23000000%22,
+    %22icons%22:[{
+      %22src%22:%22fortnite.png%22,
+      %22sizes%22:%22192x192%22,
+      %22type%22:%22image/png%22
+    }]
+  }">
 
-    <!-- CSS Inline -->
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            background-color: #f0f0f0;
-        }
-    </style>
+  <!-- CSS Inline -->
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden; /* Oculta barras de rolagem */
+    }
+    iframe {
+      width: 100vw; /* Largura total da tela */
+      height: 100vh; /* Altura total da tela */
+      border: none; /* Remove a borda do iframe */
+    }
+  </style>
 </head>
 <body>
 
-    <h1>Bem-vindo ao Aplicativo Web</h1>
-
-    <!-- Redireciona automaticamente para a URL desejada -->
-    <script>
-        // Redirecionamento para a URL externa
-        window.location.href = "https://www.xbox.com/play";
-    </script>
+  <!-- Iframe para carregar a URL -->
+  <iframe src="https://www.xbox.com/play" title="Fortnite"></iframe>
 
 </body>
 </html>
