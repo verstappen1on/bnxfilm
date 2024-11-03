@@ -1,34 +1,61 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fortnite</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplicativo Web</title>
 
-  
-  <link rel="manifest" href="manifest.json">
+    <!-- Manifesto PWA embutido -->
+    <script>
+        const manifest = {
+            "name": "Aplicativo Web",
+            "short_name": "Fortnite",
+            "start_url": "/",
+            "display": "standalone",
+            "background_color": "#ffffff",
+            "theme_color": "#000000",
+            "icons": [
+                {
+                    "src": "fortnite.png", // Certifique-se de que o fortnite.png está na mesma pasta que este arquivo
+                    "sizes": "192x192",
+                    "type": "image/png"
+                },
+                {
+                    "src": "fortnite.png",
+                    "sizes": "512x512",
+                    "type": "image/png"
+                }
+            ]
+        };
 
-  
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      background-color: #f0f0f0;
-    }
-  </style>
+        // Adiciona o manifesto ao HTML
+        const link = document.createElement('link');
+        link.rel = 'manifest';
+        link.href = 'data:application/manifest+json,' + encodeURIComponent(JSON.stringify(manifest));
+        document.head.appendChild(link);
+    </script>
+
+    <!-- CSS Inline -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+    </style>
 </head>
 <body>
 
-
-  <script>
-    
-    window.location.href = "https://www.xbox.com/play";
-  </script>
+    <!-- Redireciona automaticamente para a URL desejada -->
+    <script>
+        // Redirecionamento para a URL externa
+        window.location.href = "https://www.xbox.com/play";
+    </script>
 
 </body>
 </html>
