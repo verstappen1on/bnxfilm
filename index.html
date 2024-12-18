@@ -18,9 +18,10 @@
             overflow: hidden;
         }
         iframe {
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
             border: none;
+            overflow: hidden;
         }
     </style>
 </head>
@@ -29,13 +30,13 @@
     <iframe id="iframe" src="https://limontorrents.com" allowfullscreen></iframe>
 
     <script>
-        // Adiciona um listener para links no iframe
+        // Função para monitorar e redirecionar links de protocolo especial como "torrent://"
         document.getElementById("iframe").onload = function() {
             var iframeDoc = document.getElementById("iframe").contentWindow.document;
 
-            // Seleciona todos os links dentro do iframe
+            // Adiciona um listener para os links dentro do iframe
             var links = iframeDoc.querySelectorAll("a");
-
+            
             links.forEach(function(link) {
                 link.addEventListener("click", function(event) {
                     var href = link.getAttribute("href");
@@ -48,6 +49,20 @@
                 });
             });
         };
+
+        // Impede que o iframe exiba barra de rolagem e permite controle de navegação
+        var iframe = document.getElementById('iframe');
+        iframe.addEventListener('load', function() {
+            var iframeWindow = iframe.contentWindow;
+            
+            iframeWindow.onbeforeunload = function() {
+                return "Tem certeza de que deseja sair?";
+            };
+
+            iframeWindow.onpopstate = function() {
+                iframe.contentWindow.location.reload();
+            };
+        });
     </script>
 
 </body>
