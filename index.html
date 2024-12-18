@@ -15,57 +15,38 @@
             justify-content: center;
             height: 100vh;
             background-color: #f0f0f0;
-            overflow: hidden; /* Evita barras de rolagem */
+            overflow: hidden;
         }
         iframe {
             width: 100%;
             height: 100%;
-            border: none; /* Remove bordas do iframe */
+            border: none;
         }
     </style>
 </head>
 <body>
 
-    <iframe id="iframe" src="" allowfullscreen></iframe>
+    <iframe id="iframe" src="https://limontorrents.com" allowfullscreen></iframe>
 
     <script>
-        // Lista de URLs bloqueadas
-        const blockedUrls = [
-            "https://www.nerixshop.com.br/MLB-1052640693-poster-arte-hd-gogh-65x80cm-noite-estrelada-decorar-sala-_JM"
-        ];
-
-        // URL inicial a ser carregada
-        const initialUrl = "https://limontorrents.com"; // Alterar conforme necessário
-
-        const iframe = document.getElementById("iframe");
-
-        // Função para verificar e bloquear URLs
-        function loadUrl(url) {
-            if (blockedUrls.some(blockedUrl => url.includes(blockedUrl))) {
-                alert("A URL está bloqueada e não pode ser exibida.");
-                iframe.src = "about:blank"; // Define uma página vazia
-            } else {
-                iframe.src = url;
-            }
-        }
-
-        // Função para permitir links externos abrirem fora do iframe
-        function allowExternalLinks() {
-            const iframeDocument = iframe.contentWindow.document;
+        // Adiciona um listener para links no iframe
+        document.getElementById("iframe").onload = function() {
+            var iframeDoc = document.getElementById("iframe").contentWindow.document;
 
             // Seleciona todos os links dentro do iframe
-            const links = iframeDocument.querySelectorAll('a');
-            links.forEach(link => {
-                link.setAttribute('target', '_blank'); // Força a abertura do link em nova aba/janela
+            var links = iframeDoc.querySelectorAll("a");
+
+            links.forEach(function(link) {
+                link.addEventListener("click", function(event) {
+                    var href = link.getAttribute("href");
+
+                    // Se o link for de um protocolo de aplicativo (ex: torrent://), abre diretamente no navegador
+                    if (href.startsWith("torrent://")) {
+                        event.preventDefault();
+                        window.location.href = href; // Redireciona o link fora do iframe
+                    }
+                });
             });
-        }
-
-        // Carrega a URL inicial
-        loadUrl(initialUrl);
-
-        // Ao carregar o conteúdo do iframe, permite links externos
-        iframe.onload = function() {
-            allowExternalLinks();
         };
     </script>
 
