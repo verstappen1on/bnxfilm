@@ -15,57 +15,52 @@
             justify-content: center;
             height: 100vh;
             background-color: #f0f0f0;
-            overflow: hidden;
         }
-        iframe {
-            width: 100vw;
-            height: 100vh;
-            border: none;
+        #content {
+            width: 100%;
+            height: 100%;
             overflow: hidden;
         }
     </style>
 </head>
 <body>
 
-    <iframe id="iframe" src="https://limontorrents.com" allowfullscreen></iframe>
+    <div id="content"></div>
 
     <script>
-        // Função para monitorar e redirecionar links de protocolos especiais como "magnet:", "torrent://", e links externos
-        document.getElementById("iframe").onload = function() {
-            var iframeDoc = document.getElementById("iframe").contentWindow.document;
+        // Função para carregar uma URL diretamente no conteúdo da página
+        function loadContent(url) {
+            fetch(url)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById("content").innerHTML = html;
+                    
+                    // Após o conteúdo ser carregado, capturamos os links
+                    document.querySelectorAll("a").forEach(link => {
+                        link.addEventListener("click", function(event) {
+                            var href = link.getAttribute("href");
 
-            // Seleciona todos os links dentro do iframe
-            var links = iframeDoc.querySelectorAll("a");
-
-            links.forEach(function(link) {
-                link.addEventListener("click", function(event) {
-                    var href = link.getAttribute("href");
-
-                    // Verifica se o link começa com "magnet:", "torrent://" ou é um link externo
-                    if (href.startsWith("magnet:") || href.startsWith("torrent://")) {
-                        event.preventDefault();  // Impede a navegação padrão
-                        window.location.href = href;  // Redireciona o link fora do iframe
-                    } else if (href.startsWith("http://") || href.startsWith("https://")) {
-                        event.preventDefault();  // Impede a navegação dentro do iframe
-                        window.open(href, '_blank');  // Abre o link no navegador sem mostrar a barra do iframe
-                    }
+                            // Se o link for de protocolo "magnet:" ou "torrent://"
+                            if (href.startsWith("magnet:") || href.startsWith("torrent://")) {
+                                event.preventDefault();
+                                window.location.href = href;  // Redireciona fora da página
+                            } 
+                            // Para links HTTP(s)
+                            else if (href.startsWith("http://") || href.startsWith("https://")) {
+                                event.preventDefault();
+                                window.open(href, '_blank');  // Abre o link em uma nova aba
+                            }
+                        });
+                    });
+                })
+                .catch(err => {
+                    console.log("Erro ao carregar conteúdo: ", err);
                 });
-            });
-        };
+        }
 
-        // Impede que o iframe exiba barra de rolagem e permite controle de navegação
-        var iframe = document.getElementById('iframe');
-        iframe.addEventListener('load', function() {
-            var iframeWindow = iframe.contentWindow;
+        // Carregar a URL inicial (pode ser qualquer URL)
+        loadContent("https://limontorrents.com");
 
-            iframeWindow.onbeforeunload = function() {
-                return "Tem certeza de que deseja sair?";
-            };
-
-            iframeWindow.onpopstate = function() {
-                iframe.contentWindow.location.reload();
-            };
-        });
     </script>
 
 </body>
