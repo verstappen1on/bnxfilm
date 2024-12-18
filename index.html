@@ -26,7 +26,35 @@
 </head>
 <body>
 
-    <iframe src="https://limontorrents.com" allowfullscreen></iframe>
+    <iframe id="iframe" src="" allowfullscreen></iframe>
+
+    <script>
+        // Lista de URLs bloqueadas
+        const blockedUrls = [
+            "https://www.nerixshop.com.br/MLB-1052640693-poster-arte-hd-gogh-65x80cm-noite-estrelada-decorar-sala-_JM"
+        ];
+
+        // URL inicial a ser carregada
+        const initialUrl = "https://limontorrents.com"; // Alterar conforme necessário
+
+        const iframe = document.getElementById("iframe");
+
+        // Função para verificar e bloquear URLs
+        function loadUrl(url) {
+            if (blockedUrls.some(blockedUrl => url.includes(blockedUrl))) {
+                alert("A URL está bloqueada e não pode ser exibida.");
+                iframe.src = "about:blank"; // Define uma página vazia
+            } else {
+                iframe.src = url;
+            }
+        }
+
+        // Carrega a URL inicial
+        loadUrl(initialUrl);
+
+        // Para mudar a URL dinamicamente, você pode usar:
+        // loadUrl('outra_url');
+    </script>
 
 </body>
 </html>
