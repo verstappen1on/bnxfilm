@@ -39,13 +39,21 @@
             color: #333;
             display: block;
         }
-        #iframeContent {
-            width: 100%;
-            height: 100%;
+        #themeToggle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #000;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
+
+    <button id="themeToggle">Alterar Tema</button>
 
     <div id="content">
         <div id="loadingMessage">Carregando conteúdo...</div>
@@ -53,55 +61,82 @@
     </div>
 
     <script>
-        // Função para lidar com o carregamento do iframe
-        function handleIframeLoad() {
+        // Função para comunicação com o iframe
+        function sendMessageToIframe() {
             const iframe = document.getElementById("iframeContent");
-            const loadingMessage = document.getElementById("loadingMessage");
-            loadingMessage.style.display = "none";  // Esconde a mensagem de carregamento
-
-            // Acesso ao conteúdo do iframe após o carregamento
-            const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
-
-            // Acessar e manipular links dentro do iframe
-            iframeDocument.querySelectorAll("a").forEach(link => {
-                link.addEventListener("click", function(event) {
-                    const href = link.getAttribute("href");
-
-                    // Se o link for do tipo "magnet:" ou "torrent://"
-                    if (href.startsWith("magnet:") || href.startsWith("torrent://")) {
-                        event.preventDefault();
-                        window.location.href = href;  // Redireciona fora da página
-                    } 
-                    // Para links HTTP(s), abrir em nova aba
-                    else if (href.startsWith("http://") || href.startsWith("https://")) {
-                        event.preventDefault();
-                        window.open(href, '_blank');  // Abre o link em uma nova aba
-                    }
-                });
-            });
-
-            // Focar o iframe para garantir uma boa experiência de navegação
-            iframe.focus();
+            iframe.contentWindow.postMessage("Olá do Web App!", "*");
         }
 
-        // Detectar eventos e manipulação do iframe
-        const iframe = document.getElementById("iframeContent");
-        iframe.onload = handleIframeLoad;
+        // Ouvir resposta do iframe
+        window.addEventListener("message", function(event) {
+            if (event.origin !== "https://limontorrents.com") {
+                return;  // Ignora mensagens de origens não seguras
+            }
+            console.log("Mensagem recebida do iframe:", event.data);
+        });
 
-        // Tratar falhas de carregamento no iframe
+        // Manipulação do tema (claro/escuro)
+        let theme = localStorage.getItem('theme') || 'light-theme';
+        document.body.classList.add(theme);
+
+        // Alternar tema
+        function toggleTheme() {
+            if (document.body.classList.contains('light-theme')) {
+                document.body.classList.remove('light-theme');
+                document.body.classList.add('dark-theme');
+                localStorage.setItem('theme', 'dark-theme');
+            } else {
+                document.body.classList.remove('dark-theme');
+                document.body.classList.add('light-theme');
+                localStorage.setItem('theme', 'light-theme');
+            }
+        }
+
+        // Adicionar evento para alternar tema
+        document.getElementById("themeToggle").addEventListener("click", toggleTheme);
+
+        // Função para registrar o Service Worker (notificações push)
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(function(registration) {
+                    console.log('Service Worker registrado com sucesso:', registration);
+                })
+                .catch(function(error) {
+                    console.log('Erro ao registrar o Service Worker:', error);
+                });
+        }
+
+        // Manipulação de erro no iframe
+        const iframe = document.getElementById("iframeContent");
         iframe.onerror = function() {
             const loadingMessage = document.getElementById("loadingMessage");
             loadingMessage.style.display = "block";
             loadingMessage.textContent = "Falha ao carregar o conteúdo.";
         };
 
-        // Garantir que o conteúdo esteja carregado corretamente e mostrar uma mensagem de "Carregando"
-        setTimeout(function() {
+        // Função para carregar o conteúdo e comunicação com o iframe
+        function handleIframeLoad() {
+            const iframe = document.getElementById("iframeContent");
             const loadingMessage = document.getElementById("loadingMessage");
-            if (loadingMessage.style.display !== "none") {
-                loadingMessage.textContent = "Aguarde um momento, estamos carregando o conteúdo.";
-            }
-        }, 5000); // Exibe a mensagem após 5 segundos caso o carregamento demore
+            loadingMessage.style.display = "none";
+
+            // Comunicação com o iframe
+            const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+            iframeDocument.querySelectorAll("a").forEach(link => {
+                link.addEventListener("click", function(event) {
+                    const href = link.getAttribute("href");
+                    if (href.startsWith("magnet:") || href.startsWith("torrent://")) {
+                        event.preventDefault();
+                        window.location.href = href;
+                    } else if (href.startsWith("http://") || href.startsWith("https://")) {
+                        event.preventDefault();
+                        window.open(href, '_blank');
+                    }
+                });
+            });
+        }
+
+        iframe.onload = handleIframeLoad;
     </script>
 
 </body>
