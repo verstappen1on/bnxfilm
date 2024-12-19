@@ -2,8 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BNX Film - Carregando Conteúdo</title>
     <link rel="manifest" href="manifest.json">
     <style>
@@ -61,81 +60,46 @@
     </div>
 
     <script>
-        // Função para comunicação com o iframe
-        function sendMessageToIframe() {
-            const iframe = document.getElementById("iframeContent");
-            iframe.contentWindow.postMessage("Olá do Web App!", "*");
-        }
-
-        // Ouvir resposta do iframe
-        window.addEventListener("message", function(event) {
-            if (event.origin !== "https://limontorrents.com") {
-                return;  // Ignora mensagens de origens não seguras
-            }
-            console.log("Mensagem recebida do iframe:", event.data);
-        });
-
-        // Manipulação do tema (claro/escuro)
-        let theme = localStorage.getItem('theme') || 'light-theme';
-        document.body.classList.add(theme);
-
-        // Alternar tema
-        function toggleTheme() {
-            if (document.body.classList.contains('light-theme')) {
-                document.body.classList.remove('light-theme');
-                document.body.classList.add('dark-theme');
-                localStorage.setItem('theme', 'dark-theme');
-            } else {
-                document.body.classList.remove('dark-theme');
-                document.body.classList.add('light-theme');
-                localStorage.setItem('theme', 'light-theme');
-            }
-        }
-
-        // Adicionar evento para alternar tema
-        document.getElementById("themeToggle").addEventListener("click", toggleTheme);
-
-        // Função para registrar o Service Worker (notificações push)
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/service-worker.js')
-                .then(function(registration) {
-                    console.log('Service Worker registrado com sucesso:', registration);
-                })
-                .catch(function(error) {
-                    console.log('Erro ao registrar o Service Worker:', error);
-                });
-        }
-
-        // Manipulação de erro no iframe
-        const iframe = document.getElementById("iframeContent");
-        iframe.onerror = function() {
-            const loadingMessage = document.getElementById("loadingMessage");
-            loadingMessage.style.display = "block";
-            loadingMessage.textContent = "Falha ao carregar o conteúdo.";
-        };
-
-        // Função para carregar o conteúdo e comunicação com o iframe
+        // Função para carregar o conteúdo do iframe e manipular os links
         function handleIframeLoad() {
             const iframe = document.getElementById("iframeContent");
             const loadingMessage = document.getElementById("loadingMessage");
             loadingMessage.style.display = "none";
 
-            // Comunicação com o iframe
+            // Captura todos os links dentro do iframe
             const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+
+            // Adiciona evento de click para os links
             iframeDocument.querySelectorAll("a").forEach(link => {
                 link.addEventListener("click", function(event) {
                     const href = link.getAttribute("href");
-                    if (href.startsWith("magnet:") || href.startsWith("torrent://")) {
+
+                    // Verifica se o link é externo
+                    if (isExternalLink(href)) {
                         event.preventDefault();
+                        window.open(href, "_blank");  // Abre o link em uma nova aba ou janela
+                    } else if (href.startsWith("magnet:") || href.startsWith("torrent://")) {
+                        event.preventDefault();
+                        window.location.href = href;  // Para links de torrent ou magnet
+                    } else {
+                        // Para outros links internos, permite o comportamento padrão
                         window.location.href = href;
-                    } else if (href.startsWith("http://") || href.startsWith("https://")) {
-                        event.preventDefault();
-                        window.open(href, '_blank');
                     }
                 });
             });
         }
 
+        // Função para verificar se o link é externo
+        function isExternalLink(url) {
+            // Verifica se a URL é externa comparando com a URL da página atual
+            const currentDomain = window.location.hostname;
+            const linkDomain = (new URL(url)).hostname;
+            
+            // Retorna true se o domínio for diferente do atual, ou se for um link externo
+            return linkDomain !== currentDomain && linkDomain !== '';
+        }
+
+        const iframe = document.getElementById("iframeContent");
         iframe.onload = handleIframeLoad;
     </script>
 
