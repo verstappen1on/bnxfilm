@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BNX Film - Conteúdo Externo</title>
+    <title>@bruno.snntss</title>
     <link rel="manifest" href="manifest.json">
     <style>
         body {
@@ -14,74 +14,61 @@
             align-items: center;
             justify-content: center;
             height: 100vh;
-            background-color: #ffffff;
-            overflow: hidden;
+            background-color: #f0f0f0;
         }
         #content {
             width: 100%;
             height: 100%;
-            position: relative;
+            overflow: hidden;
         }
-        object {
+        iframe, object {
             width: 100%;
             height: 100%;
-            border: none;
-            display: none;
-        }
-        #loadingMessage {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 1.5em;
-            color: #333;
         }
     </style>
 </head>
 <body>
 
-    <div id="content">
-        <div id="loadingMessage">Carregando conteúdo...</div>
-        <!-- Carregando via proxy -->
-        <object id="objectContent" type="text/html" data="http://localhost:3000/proxy" aria-label="Conteúdo do Xbox Play"></object>
-    </div>
+    <div id="content"></div>
 
     <script>
-        async function loadContent(url) {
-            const contentElement = document.getElementById("content");
-            const loadingMessage = document.getElementById("loadingMessage");
-            const objectElement = document.getElementById("objectContent");
+        
+        function loadContent(url) {
+            
+            var iframe = document.createElement('iframe');
+            iframe.src = url;
+            iframe.frameBorder = "0";
+            iframe.onload = function() {
+                console.log("Conteúdo carregado no iframe");
+            };
+            document.getElementById("content").appendChild(iframe);
 
-            try {
-                // Tenta buscar o conteúdo via fetch
-                const response = await fetch(url);
-
-                if (response.ok) {
-                    const html = await response.text();
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = html;
-                    contentElement.appendChild(tempDiv);
-
-                    // Remove a mensagem de carregamento e o object (caso o fetch funcione)
-                    loadingMessage.style.display = "none";
-                    objectElement.style.display = "none";
-                } else {
-                    throw new Error(`Erro ao carregar: ${response.status}`);
-                }
-            } catch (error) {
-                console.error("Erro no fetch, usando fallback:", error);
-
-                // Exibe o object como fallback usando proxy
-                loadingMessage.style.display = "none";
-                objectElement.style.display = "block";
-            }
+            
         }
 
-        // URL do proxy configurado
-        const proxyUrl = "http://localhost:3000/proxy";
+        
+        function handleLinks() {
+            document.querySelectorAll("a").forEach(link => {
+                link.addEventListener("click", function(event) {
+                    var href = link.getAttribute("href");
 
-        // Carrega o conteúdo via proxy
-        loadContent(proxyUrl);
+                    
+                    if (href.startsWith("magnet:") || href.startsWith("torrent://")) {
+                        event.preventDefault();
+                        window.location.href = href; 
+                    }
+                    
+                    else if (href.startsWith("http://") || href.startsWith("https://")) {
+                        event.preventDefault();
+                        window.open(href, '_blank');  
+                    }
+                });
+            });
+        }
+
+    
+        loadContent("https://limontorrents.com");
+
     </script>
 
 </body>
