@@ -42,11 +42,11 @@
 
     <div id="content">
         <div id="loadingMessage">Carregando conteúdo...</div>
-        <object id="objectContent" type="text/html" data="https://limontorrents.com" aria-label="Conteúdo do site limontorrents"></object>
+        <!-- Ajustado para carregar via proxy -->
+        <object id="objectContent" type="text/html" data="http://localhost:3000/proxy" aria-label="Conteúdo do site proxy"></object>
     </div>
 
     <script>
-        // Função para tentar carregar o conteúdo usando fetch()
         async function loadContent(url) {
             const contentElement = document.getElementById("content");
             const loadingMessage = document.getElementById("loadingMessage");
@@ -58,12 +58,11 @@
 
                 if (response.ok) {
                     const html = await response.text();
-                    // Insere o HTML no conteúdo diretamente
                     const tempDiv = document.createElement('div');
                     tempDiv.innerHTML = html;
                     contentElement.appendChild(tempDiv);
 
-                    // Remove a mensagem de carregamento e o fallback (object)
+                    // Remove a mensagem de carregamento e o object (caso o fetch funcione)
                     loadingMessage.style.display = "none";
                     objectElement.style.display = "none";
                 } else {
@@ -72,17 +71,17 @@
             } catch (error) {
                 console.error("Erro no fetch, usando fallback:", error);
 
-                // Exibe o object como fallback
+                // Exibe o object como fallback usando proxy
                 loadingMessage.style.display = "none";
                 objectElement.style.display = "block";
             }
         }
 
-        // URL do site a ser carregado
-        const externalUrl = "https://xbox.com/play";
+        // URL do proxy configurado
+        const proxyUrl = "http://localhost:3000/proxy";
 
-        // Carrega o conteúdo
-        loadContent(externalUrl);
+        // Carrega o conteúdo via proxy
+        loadContent(proxyUrl);
     </script>
 
 </body>
