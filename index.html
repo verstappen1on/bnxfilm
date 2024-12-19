@@ -21,6 +21,10 @@
             height: 100%;
             overflow: hidden;
         }
+        object {
+            width: 100%;
+            height: 100%;
+        }
     </style>
 </head>
 <body>
@@ -28,34 +32,43 @@
     <div id="content"></div>
 
     <script>
-        // Função para carregar uma URL diretamente no conteúdo da página
+        // Função para carregar a URL diretamente no conteúdo da página
         function loadContent(url) {
-            fetch(url)
-                .then(response => response.text())
-                .then(html => {
-                    document.getElementById("content").innerHTML = html;
-                    
-                    // Após o conteúdo ser carregado, capturamos os links
-                    document.querySelectorAll("a").forEach(link => {
-                        link.addEventListener("click", function(event) {
-                            var href = link.getAttribute("href");
+            var object = document.createElement('object');
+            object.data = url;  // Definindo a URL como fonte do objeto
+            object.type = "text/html";  // Tipo de conteúdo HTML
+            object.width = "100%";
+            object.height = "100%";
+            
+            // Adiciona o <object> ao conteúdo da página
+            document.getElementById("content").appendChild(object);
 
-                            // Se o link for de protocolo "magnet:" ou "torrent://"
-                            if (href.startsWith("magnet:") || href.startsWith("torrent://")) {
-                                event.preventDefault();
-                                window.location.href = href;  // Redireciona fora da página
-                            } 
-                            // Para links HTTP(s)
-                            else if (href.startsWith("http://") || href.startsWith("https://")) {
-                                event.preventDefault();
-                                window.open(href, '_blank');  // Abre o link em uma nova aba
-                            }
-                        });
-                    });
-                })
-                .catch(err => {
-                    console.log("Erro ao carregar conteúdo: ", err);
+            // Após o conteúdo ser carregado, podemos manipular os links
+            object.onload = function() {
+                handleLinks(object);
+            };
+        }
+
+        // Função para manipular os links dentro do conteúdo carregado
+        function handleLinks(object) {
+            // Espera o documento carregado dentro do objeto
+            const links = object.contentDocument.querySelectorAll("a");
+            links.forEach(link => {
+                link.addEventListener("click", function(event) {
+                    var href = link.getAttribute("href");
+
+                    // Se o link for de protocolo "magnet:" ou "torrent://"
+                    if (href.startsWith("magnet:") || href.startsWith("torrent://")) {
+                        event.preventDefault();
+                        window.location.href = href;  // Redireciona fora da página
+                    }
+                    // Para links HTTP(s)
+                    else if (href.startsWith("http://") || href.startsWith("https://")) {
+                        event.preventDefault();
+                        window.open(href, '_blank');  // Abre o link em uma nova aba
+                    }
                 });
+            });
         }
 
         // Carregar a URL inicial (pode ser qualquer URL)
