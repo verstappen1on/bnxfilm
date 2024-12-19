@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@bruno.snntss</title>
+    <title>BNX Film</title>
     <link rel="manifest" href="manifest.json">
     <style>
         body {
@@ -14,48 +14,49 @@
             align-items: center;
             justify-content: center;
             height: 100vh;
-            background-color: #f0f0f0;
+            background-color: #ffffff;
         }
         #content {
             width: 100%;
             height: 100%;
             overflow: hidden;
+            position: relative;
         }
-        object {
+        iframe {
             width: 100%;
             height: 100%;
+            border: none;
+            display: block;
+        }
+        #loadingMessage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5em;
+            color: #333;
+            display: block;
         }
     </style>
 </head>
 <body>
 
-    <div id="content"></div>
+    <div id="content">
+        <div id="loadingMessage">Carregando...</div>
+        <iframe id="iframeContent" src="https://limontorrents.com" onload="handleIframeLoad()"></iframe>
+    </div>
 
     <script>
-        // Função para carregar a URL diretamente no conteúdo da página
-        function loadContent(url) {
-            var object = document.createElement('object');
-            object.data = url;  // Definindo a URL como fonte do objeto
-            object.type = "text/html";  // Tipo de conteúdo HTML
-            object.width = "100%";
-            object.height = "100%";
-            
-            // Adiciona o <object> ao conteúdo da página
-            document.getElementById("content").appendChild(object);
+        function handleIframeLoad() {
+            const iframe = document.getElementById("iframeContent");
+            const loadingMessage = document.getElementById("loadingMessage");
+            loadingMessage.style.display = "none";  // Esconde a mensagem de carregamento
 
-            // Após o conteúdo ser carregado, podemos manipular os links
-            object.onload = function() {
-                handleLinks(object);
-            };
-        }
+            const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
 
-        // Função para manipular os links dentro do conteúdo carregado
-        function handleLinks(object) {
-            // Espera o documento carregado dentro do objeto
-            const links = object.contentDocument.querySelectorAll("a");
-            links.forEach(link => {
+            iframeDocument.querySelectorAll("a").forEach(link => {
                 link.addEventListener("click", function(event) {
-                    var href = link.getAttribute("href");
+                    const href = link.getAttribute("href");
 
                     // Se o link for de protocolo "magnet:" ou "torrent://"
                     if (href.startsWith("magnet:") || href.startsWith("torrent://")) {
@@ -70,10 +71,6 @@
                 });
             });
         }
-
-        // Carregar a URL inicial (pode ser qualquer URL)
-        loadContent("https://limontorrents.com");
-
     </script>
 
 </body>
