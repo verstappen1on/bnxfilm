@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BNX Film - Carregando Conteúdo</title>
+    <title>BNX Film - Conteúdo Externo</title>
     <link rel="manifest" href="manifest.json">
     <style>
         body {
@@ -20,14 +20,13 @@
         #content {
             width: 100%;
             height: 100%;
-            overflow: hidden;
             position: relative;
         }
-        iframe {
+        object {
             width: 100%;
             height: 100%;
             border: none;
-            display: block;
+            display: none;
         }
         #loadingMessage {
             position: absolute;
@@ -36,71 +35,54 @@
             transform: translate(-50%, -50%);
             font-size: 1.5em;
             color: #333;
-            display: block;
-        }
-        #themeToggle {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background-color: #000;
-            color: white;
-            border: none;
-            padding: 10px;
-            cursor: pointer;
         }
     </style>
 </head>
 <body>
 
-    <button id="themeToggle">Alterar Tema</button>
-
     <div id="content">
         <div id="loadingMessage">Carregando conteúdo...</div>
-        <iframe id="iframeContent" src="https://limontorrents.com" title="Conteúdo do site limontorrents" aria-label="Conteúdo do site limontorrents"></iframe>
+        <object id="objectContent" type="text/html" data="https://limontorrents.com" aria-label="Conteúdo do site limontorrents"></object>
     </div>
 
     <script>
-        // Função para carregar o conteúdo do iframe e manipular os links
-        function handleIframeLoad() {
-            const iframe = document.getElementById("iframeContent");
+        // Função para tentar carregar o conteúdo usando fetch()
+        async function loadContent(url) {
+            const contentElement = document.getElementById("content");
             const loadingMessage = document.getElementById("loadingMessage");
-            loadingMessage.style.display = "none";
+            const objectElement = document.getElementById("objectContent");
 
-            // Captura todos os links dentro do iframe
-            const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+            try {
+                // Tenta buscar o conteúdo via fetch
+                const response = await fetch(url);
 
-            // Adiciona evento de click para os links
-            iframeDocument.querySelectorAll("a").forEach(link => {
-                link.addEventListener("click", function(event) {
-                    const href = link.getAttribute("href");
+                if (response.ok) {
+                    const html = await response.text();
+                    // Insere o HTML no conteúdo diretamente
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = html;
+                    contentElement.appendChild(tempDiv);
 
-                    // Verifica se o link é externo
-                    if (isExternalLink(href)) {
-                        event.preventDefault();
-                        window.open(href, "_blank");  // Abre o link em uma nova aba ou janela
-                    } else if (href.startsWith("magnet:") || href.startsWith("torrent://")) {
-                        event.preventDefault();
-                        window.location.href = href;  // Para links de torrent ou magnet
-                    } else {
-                        // Para outros links internos, permite o comportamento padrão
-                        window.location.href = href;
-                    }
-                });
-            });
+                    // Remove a mensagem de carregamento e o fallback (object)
+                    loadingMessage.style.display = "none";
+                    objectElement.style.display = "none";
+                } else {
+                    throw new Error(`Erro ao carregar: ${response.status}`);
+                }
+            } catch (error) {
+                console.error("Erro no fetch, usando fallback:", error);
+
+                // Exibe o object como fallback
+                loadingMessage.style.display = "none";
+                objectElement.style.display = "block";
+            }
         }
 
-        // Função para verificar se o link é externo
-        function isExternalLink(url) {
-            // Verifica se a URL é externa comparando com a URL da página atual
-            const currentDomain = window.location.hostname;
-            const linkDomain = (new URL(url)).hostname;
-            
-            // Retorna true se o domínio for diferente do atual, ou se for um link externo
-            return linkDomain !== currentDomain && linkDomain !== '';
-        }
+        // URL do site a ser carregado
+        const externalUrl = "https://limontorrents.com";
 
-        const iframe = document.getElementById("iframeContent");
-        iframe.onload = handleIframeLoad;
+        // Carrega o conteúdo
+        loadContent(externalUrl);
     </script>
 
 </body>
