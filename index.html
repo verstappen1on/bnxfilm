@@ -2,8 +2,9 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BNX Film</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>BNX Film - Carregando Conteúdo</title>
     <link rel="manifest" href="manifest.json">
     <style>
         body {
@@ -15,6 +16,7 @@
             justify-content: center;
             height: 100vh;
             background-color: #ffffff;
+            overflow: hidden;
         }
         #content {
             width: 100%;
@@ -37,40 +39,69 @@
             color: #333;
             display: block;
         }
+        #iframeContent {
+            width: 100%;
+            height: 100%;
+        }
     </style>
 </head>
 <body>
 
     <div id="content">
-        <div id="loadingMessage">Carregando...</div>
-        <iframe id="iframeContent" src="https://limontorrents.com" onload="handleIframeLoad()"></iframe>
+        <div id="loadingMessage">Carregando conteúdo...</div>
+        <iframe id="iframeContent" src="https://limontorrents.com" title="Conteúdo do site limontorrents" aria-label="Conteúdo do site limontorrents"></iframe>
     </div>
 
     <script>
+        // Função para lidar com o carregamento do iframe
         function handleIframeLoad() {
             const iframe = document.getElementById("iframeContent");
             const loadingMessage = document.getElementById("loadingMessage");
             loadingMessage.style.display = "none";  // Esconde a mensagem de carregamento
 
+            // Acesso ao conteúdo do iframe após o carregamento
             const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
 
+            // Acessar e manipular links dentro do iframe
             iframeDocument.querySelectorAll("a").forEach(link => {
                 link.addEventListener("click", function(event) {
                     const href = link.getAttribute("href");
 
-                    // Se o link for de protocolo "magnet:" ou "torrent://"
+                    // Se o link for do tipo "magnet:" ou "torrent://"
                     if (href.startsWith("magnet:") || href.startsWith("torrent://")) {
                         event.preventDefault();
                         window.location.href = href;  // Redireciona fora da página
-                    }
-                    // Para links HTTP(s)
+                    } 
+                    // Para links HTTP(s), abrir em nova aba
                     else if (href.startsWith("http://") || href.startsWith("https://")) {
                         event.preventDefault();
                         window.open(href, '_blank');  // Abre o link em uma nova aba
                     }
                 });
             });
+
+            // Focar o iframe para garantir uma boa experiência de navegação
+            iframe.focus();
         }
+
+        // Detectar eventos e manipulação do iframe
+        const iframe = document.getElementById("iframeContent");
+        iframe.onload = handleIframeLoad;
+
+        // Tratar falhas de carregamento no iframe
+        iframe.onerror = function() {
+            const loadingMessage = document.getElementById("loadingMessage");
+            loadingMessage.style.display = "block";
+            loadingMessage.textContent = "Falha ao carregar o conteúdo.";
+        };
+
+        // Garantir que o conteúdo esteja carregado corretamente e mostrar uma mensagem de "Carregando"
+        setTimeout(function() {
+            const loadingMessage = document.getElementById("loadingMessage");
+            if (loadingMessage.style.display !== "none") {
+                loadingMessage.textContent = "Aguarde um momento, estamos carregando o conteúdo.";
+            }
+        }, 5000); // Exibe a mensagem após 5 segundos caso o carregamento demore
     </script>
 
 </body>
